@@ -32,6 +32,9 @@ import { Bug, Sparkles } from 'lucide-react';
  * @property {string} assignee
  * @property {string|null} dueDate     ISO 'YYYY-MM-DD'
  * @property {string} createdDate      ISO 'YYYY-MM-DD'
+ * @property {string} context                curated briefing for the next AI / teammate
+ * @property {string|null} contextTool       'Claude'|'ChatGPT'|'Cursor'|'Lovable'|'Replit'|'Other'
+ * @property {string|null} contextUpdatedAt  ISO timestamp, set on save
  */
 
 // The four columns of the board, in render order.
@@ -153,6 +156,9 @@ function newTask() {
     assignee: TEAM[0],
     dueDate: null,
     createdDate: new Date().toISOString().slice(0, 10),
+    context: '',
+    contextTool: null,
+    contextUpdatedAt: null,
   };
 }
 
@@ -169,7 +175,9 @@ function TaskModal({ task, onSave, onDelete, onClose }) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          onSave(draft);
+          const contextChanged =
+            (draft.context ?? '') !== (task.context ?? '') || (draft.contextTool ?? null) !== (task.contextTool ?? null);
+          onSave(contextChanged ? { ...draft, contextUpdatedAt: new Date().toISOString() } : draft);
         }}
         className="w-full max-w-md space-y-3 rounded-lg bg-surface_card p-6"
       >
@@ -184,6 +192,38 @@ function TaskModal({ task, onSave, onDelete, onClose }) {
           Description
           <textarea rows={3} value={draft.description} onChange={set('description')} className={FIELD_CLASS} />
         </label>
+
+        <label className="block text-sm text-text_muted">
+          Context
+          <textarea
+            rows={5}
+            value={draft.context ?? ''}
+            onChange={set('context')}
+            placeholder="Briefing for the next AI or teammate: the goal, what's done, the prompt that worked, what's left."
+            className={FIELD_CLASS}
+          />
+        </label>
+
+        <div className="flex items-end justify-between gap-3">
+          <label className="block flex-1 text-sm text-text_muted">
+            Context tool
+            <select
+              value={draft.contextTool ?? ''}
+              onChange={(e) => setDraft({ ...draft, contextTool: e.target.value || null })}
+              className={FIELD_CLASS}
+            >
+              <option value="">—</option>
+              {['Claude', 'ChatGPT', 'Cursor', 'Lovable', 'Replit', 'Other'].map((tool) => (
+                <option key={tool} value={tool}>{tool}</option>
+              ))}
+            </select>
+          </label>
+          {draft.contextUpdatedAt && (
+            <p className="pb-1 text-xs text-text_muted">
+              Context updated {new Date(draft.contextUpdatedAt).toLocaleString()}
+            </p>
+          )}
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm text-text_muted">
