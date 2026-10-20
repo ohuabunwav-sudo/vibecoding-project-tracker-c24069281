@@ -43,8 +43,8 @@ These are the colors the build milestones will reference. Once chosen, paste the
 
 | Token | Hex | When used |
 |---|---|---|
-| `type_feature` | `#10B981` | Cards tagged `feature` (accent stripe + icon) |
-| `type_bug` | `#DC2626` | Cards tagged `bug` (accent stripe + icon) |
+| `feature` | `#10B981` | Cards tagged `feature` (accent stripe + icon) |
+| `bug` | `#DC2626` | Cards tagged `bug` (accent stripe + icon) |
 
 ### Due-date states (M8 `due-tint`)
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Bug, Sparkles } from 'lucide-react';
 
 /**
  * Vibecoding Project Tracker — starter scaffold.
@@ -89,6 +90,12 @@ const SEED_TASKS = [
     createdDate: '2026-10-20',
   },
 ];
+
+// M6 tag-style: one place for how each task type looks.
+const TYPE_STYLE = {
+  feature: { label: 'Feature', stripe: 'border-l-feature', icon: <Sparkles size={12} className="text-feature" /> },
+  bug:     { label: 'Bug',     stripe: 'border-l-bug',     icon: <Bug size={12} className="text-bug" /> },
+};
 
 /**
  * A tiny localStorage hook — survives reloads, no library needed.
@@ -280,8 +287,12 @@ export default function App() {
                   <article
                     key={task.id}
                     onClick={() => setEditing(task)}
-                    className="cursor-pointer rounded-lg border border-text_muted/20 bg-surface_card p-3"
+                    className={`cursor-pointer rounded-lg border border-l-4 border-text_muted/20 ${TYPE_STYLE[task.type].stripe} bg-surface_card p-3`}
                   >
+                    <span className="mb-1 inline-flex items-center gap-1 text-xs text-text_muted">
+                      {TYPE_STYLE[task.type].icon}
+                      {TYPE_STYLE[task.type].label}
+                    </span>
                     <h3 className="text-sm font-medium text-text_primary">{task.title}</h3>
                     <p className="text-xs text-text_muted">
                       {task.assignee} · due {task.dueDate}
