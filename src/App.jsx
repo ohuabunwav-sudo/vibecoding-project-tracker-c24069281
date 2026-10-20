@@ -92,6 +92,96 @@ const SEED_TASKS = [
     dueDate: '2026-10-23',
     createdDate: '2026-10-20',
   },
+  {
+    id: '5',
+    title: 'M4 · Four-column board',
+    description: 'Render STAGES as columns with 3-4 mock tasks.',
+    type: 'feature',
+    status: 'done',
+    assignee: TEAM[0],
+    dueDate: '2026-10-16',
+    createdDate: '2026-10-15',
+  },
+  {
+    id: '6',
+    title: 'M5 · Add / edit / delete modal',
+    description: '"+ New Task" and click-to-edit, persisted to localStorage.',
+    type: 'feature',
+    status: 'done',
+    assignee: TEAM[0],
+    dueDate: '2026-10-17',
+    createdDate: '2026-10-15',
+  },
+  {
+    id: '7',
+    title: 'M6 · Feature / bug colours',
+    description: 'Type stripe and icon on each card.',
+    type: 'feature',
+    status: 'review',
+    assignee: TEAM[0],
+    dueDate: '2026-10-21',
+    createdDate: '2026-10-16',
+  },
+  {
+    id: '8',
+    title: 'M7 · Hand-off dropdown opens the edit modal',
+    description: 'Clicking "Hand off to…" also triggers the card click.',
+    type: 'bug',
+    status: 'in-progress',
+    assignee: TEAM[0],
+    dueDate: '2026-10-19',
+    createdDate: '2026-10-17',
+  },
+  {
+    id: '9',
+    title: 'M8 · Due-date tinting',
+    description: 'Safe / warning / overdue / neutral card backgrounds.',
+    type: 'feature',
+    status: 'todo',
+    assignee: TEAM[0],
+    dueDate: '2026-10-24',
+    createdDate: '2026-10-17',
+  },
+  {
+    id: '10',
+    title: 'M9 · Context field',
+    description: 'Curated briefing and tool on the task modal.',
+    type: 'feature',
+    status: 'review',
+    assignee: TEAM[0],
+    dueDate: '2026-10-22',
+    createdDate: '2026-10-18',
+  },
+  {
+    id: '11',
+    title: 'M10 · Copy as Prompt Context shows "due null"',
+    description: 'Tasks without a due date paste "null" into the prompt.',
+    type: 'bug',
+    status: 'in-progress',
+    assignee: TEAM[0],
+    dueDate: '2026-10-20',
+    createdDate: '2026-10-19',
+  },
+  {
+    id: '12',
+    title: 'M11 · Anchor Board',
+    description: 'Four pinned deliverable links above the board.',
+    type: 'feature',
+    status: 'todo',
+    assignee: TEAM[0],
+    dueDate: '2026-10-26',
+    createdDate: '2026-10-19',
+  },
+  {
+    id: '13',
+    title: 'M12 · Progress graph',
+    description: 'Completion % and stage breakdown above the board.',
+    type: 'feature',
+    status: 'done',
+    assignee: TEAM[0],
+    dueDate: '2026-10-20',
+    createdDate: '2026-10-20',
+  },
 ];
 
 // M6 tag-style: one place for how each task type looks.
@@ -99,6 +189,48 @@ const TYPE_STYLE = {
   feature: { label: 'Feature', stripe: 'border-l-feature', icon: <Sparkles size={12} className="text-feature" /> },
   bug:     { label: 'Bug',     stripe: 'border-l-bug',     icon: <Bug size={12} className="text-bug" /> },
 };
+
+// M12 secret-sauce: stages run light → dark plum, so "further along" reads as "deeper".
+const STAGE_COLOR = { todo: '#BBA3D3', 'in-progress': '#9673BB', review: '#71499C', done: '#4B2A6B' };
+
+function ProgressChart({ tasks }) {
+  const total = tasks.length;
+  const counts = STAGES.map((stage) => ({ ...stage, count: tasks.filter((t) => t.status === stage.id).length }));
+  const done = counts.find((s) => s.id === 'done').count;
+  const percent = total ? Math.round((done / total) * 100) : 0;
+
+  return (
+    <section className="mb-6 rounded-lg border border-text_muted/20 bg-surface_card p-4">
+      <div className="mb-3 flex items-baseline justify-between">
+        <h2 className="text-base font-semibold uppercase text-text_primary">Progress</h2>
+        <p className="text-sm text-text_muted">
+          <span className="text-2xl font-semibold text-text_primary">{percent}%</span> complete · {done} of {total} tasks done
+        </p>
+      </div>
+      {total === 0 ? (
+        <p className="text-sm text-text_muted">No tasks yet.</p>
+      ) : (
+        <div className="flex h-4 gap-[2px] overflow-hidden rounded">
+          {counts.filter((s) => s.count > 0).map((s) => (
+            <div
+              key={s.id}
+              title={`${s.label}: ${s.count} task${s.count === 1 ? '' : 's'} (${Math.round((s.count / total) * 100)}%)`}
+              style={{ flexGrow: s.count, backgroundColor: STAGE_COLOR[s.id] }}
+            />
+          ))}
+        </div>
+      )}
+      <ul className="mt-3 flex gap-4 text-xs text-text_muted">
+        {counts.map((s) => (
+          <li key={s.id} className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: STAGE_COLOR[s.id] }} />
+            {s.label} <span className="font-medium text-text_primary">{s.count}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 // M11 anchors: the four pinned deliverable slots (PRD §5).
 const SEED_ANCHORS = [
@@ -414,6 +546,8 @@ export default function App() {
           </div>
         ))}
       </section>
+
+      <ProgressChart tasks={tasks} />
 
       <main className="grid grid-cols-4 gap-4">
         {STAGES.map((stage) => {
