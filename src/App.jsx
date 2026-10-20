@@ -84,7 +84,7 @@ const SEED_TASKS = [
     description: 'M5: "+" button and click-to-edit, persisted to localStorage.',
     type: 'feature',
     status: 'todo',
-    assignee: TEAM[A],
+    assignee: TEAM[0],
     dueDate: '2026-10-23',
     createdDate: '2026-10-20',
   },
