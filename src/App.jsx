@@ -527,6 +527,7 @@ export default function App() {
         </button>
       </header>
 
+
       <section className="mb-6 grid grid-cols-4 gap-4">
         {anchors.map((anchor) => (
           <div
