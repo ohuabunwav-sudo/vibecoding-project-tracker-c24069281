@@ -117,11 +117,130 @@ export function useLocalStorage(key, initialValue) {
   return [value, setValue];
 }
 
+// M5 crud-modal: a blank task for the "New Task" button.
+function newTask() {
+  return {
+    id: String(Date.now()),
+    title: '',
+    description: '',
+    type: 'feature',
+    status: 'todo',
+    assignee: TEAM[0],
+    dueDate: null,
+    createdDate: new Date().toISOString().slice(0, 10),
+  };
+}
+
+const FIELD_CLASS =
+  'mt-1 block w-full rounded-md border border-text_muted/30 bg-surface_page px-2 py-1 text-sm text-text_primary focus:outline-none focus:ring-2 focus:ring-brand_primary';
+
+// M5 crud-modal: one modal for add and edit. onDelete is only passed when editing.
+function TaskModal({ task, onSave, onDelete, onClose }) {
+  const [draft, setDraft] = useState(task);
+  const set = (field) => (e) => setDraft({ ...draft, [field]: e.target.value });
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-text_primary/40">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSave(draft);
+        }}
+        className="w-full max-w-md space-y-3 rounded-lg bg-surface_card p-6"
+      >
+        <h2 className="text-lg font-semibold text-text_primary">{onDelete ? 'Edit task' : 'New task'}</h2>
+
+        <label className="block text-sm text-text_muted">
+          Title
+          <input required value={draft.title} onChange={set('title')} className={FIELD_CLASS} />
+        </label>
+
+        <label className="block text-sm text-text_muted">
+          Description
+          <textarea rows={3} value={draft.description} onChange={set('description')} className={FIELD_CLASS} />
+        </label>
+
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block text-sm text-text_muted">
+            Type
+            <select value={draft.type} onChange={set('type')} className={FIELD_CLASS}>
+              <option value="feature">Feature</option>
+              <option value="bug">Bug</option>
+            </select>
+          </label>
+
+          <label className="block text-sm text-text_muted">
+            Status
+            <select value={draft.status} onChange={set('status')} className={FIELD_CLASS}>
+              {STAGES.map((stage) => (
+                <option key={stage.id} value={stage.id}>{stage.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block text-sm text-text_muted">
+            Assignee
+            <select value={draft.assignee} onChange={set('assignee')} className={FIELD_CLASS}>
+              {TEAM.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block text-sm text-text_muted">
+            Due date
+            <input
+              type="date"
+              value={draft.dueDate ?? ''}
+              onChange={(e) => setDraft({ ...draft, dueDate: e.target.value || null })}
+              className={FIELD_CLASS}
+            />
+          </label>
+        </div>
+
+        <p className="text-xs text-text_muted">Created {draft.createdDate}</p>
+
+        <div className="flex items-center justify-between pt-2">
+          {onDelete ? (
+            <button type="button" onClick={() => onDelete(draft.id)} className="text-sm text-due_overdue">
+              Delete
+            </button>
+          ) : (
+            <span />
+          )}
+          <div className="space-x-2">
+            <button type="button" onClick={onClose} className="rounded-md border border-brand_primary px-4 py-2 text-sm text-brand_primary">
+              Cancel
+            </button>
+            <button type="submit" className="rounded-md bg-brand_primary px-4 py-2 text-sm text-surface_card hover:bg-brand_accent">
+              Save
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 export default function App() {
   const [tasks, setTasks] = useLocalStorage('vibetracker.tasks', SEED_TASKS);
   //
-  // TODO M5 crud-modal:
-  //   const [editing, setEditing] = useState(null);
+  const [editing, setEditing] = useState(null);
+
+  function saveTask(task) {
+    setTasks((prev) =>
+      prev.some((t) => t.id === task.id)
+        ? prev.map((t) => (t.id === task.id ? task : t))
+        : [...prev, task]
+    );
+    setEditing(null);
+  }
+
+  function deleteTask(id) {
+    if (!window.confirm('Are you sure you want to delete?')) return;
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    setEditing(null);
+  }
   //
   // TODO M11 anchors:
   //   const [anchors, setAnchors] = useLocalStorage('vibetracker.anchors', [...]);
@@ -135,18 +254,19 @@ export default function App() {
           </h1>
           <p className="text-sm text-slate-500">
             C2406921
-            Team starter
+            Cosy Coder's
           </p>
         </div>
+        <button
+          onClick={() => setEditing(newTask())}
+          className="rounded-md bg-brand_primary px-4 py-2 text-sm font-medium text-surface_card hover:bg-brand_accent"
+        >
+          + New Task
+        </button>
       </header>
 
       {/* TODO M11 anchors: render the Anchor Board (Presentation / Demo / Report / Documentation) above the board. */}
 
-      {/*
-        TODO M5 crud-modal:
-          Add a "+" button that opens a modal with every Task field.
-          Clicking a card should open the same modal in edit mode.
-      */}
       <main className="grid grid-cols-4 gap-4">
         {STAGES.map((stage) => {
           const stageTasks = tasks.filter((task) => task.status === stage.id);
@@ -157,7 +277,11 @@ export default function App() {
               </h2>
               <div className="space-y-2">
                 {stageTasks.map((task) => (
-                  <article key={task.id} className="rounded-lg border border-text_muted/20 bg-surface_card p-3">
+                  <article
+                    key={task.id}
+                    onClick={() => setEditing(task)}
+                    className="cursor-pointer rounded-lg border border-text_muted/20 bg-surface_card p-3"
+                  >
                     <h3 className="text-sm font-medium text-text_primary">{task.title}</h3>
                     <p className="text-xs text-text_muted">
                       {task.assignee} · due {task.dueDate}
@@ -169,6 +293,15 @@ export default function App() {
           );
         })}
       </main>
+
+      {editing && (
+        <TaskModal
+          task={editing}
+          onSave={saveTask}
+          onDelete={tasks.some((t) => t.id === editing.id) ? deleteTask : undefined}
+          onClose={() => setEditing(null)}
+        />
+      )}
     </div>
   );
 }
