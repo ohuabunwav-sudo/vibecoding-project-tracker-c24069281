@@ -497,7 +497,8 @@ export default function App() {
       .then(() => setToast('Copied and ready for AI'))
       .catch(() => setToast("Couldn't copy, try again."));
   }
-  //
+  
+  // M11 anchors: the four pinned deliverable slots (PRD §5).
   const [anchors, setAnchors] = useLocalStorage('vibetracker.anchors', SEED_ANCHORS);
 
   function editAnchor(anchor) {
