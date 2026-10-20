@@ -32,28 +32,28 @@ These are the colors the build milestones will reference. Once chosen, paste the
 
 | Token | Hex | Where it shows up |
 |---|---|---|
-| `brand-primary` | `#4B2A6B` | Header, "+" button, focus rings |
-| `brand-accent` | `#4F7A5A` | Highlights, hover states, links |
-| `surface-page` | `#F7F3EE` | Page background |
-| `surface-card` | `#FFFDF9` | Card background |
-| `text-primary` | `#1A1620` | Body text |
-| `text-muted` | `#6B6474` | Captions, dates, counts |
+| `brand_primary` | `#4B2A6B` | Header, "+" button, focus rings |
+| `brand_accent` | `#4F7A5A` | Highlights, hover states, links |
+| `surface_page` | `#F7F3EE` | Page background |
+| `surface_card` | `#FFFDF9` | Card background |
+| `text_primary` | `#1A1620` | Body text |
+| `text_muted` | `#6B6474` | Captions, dates, counts |
 
 ### Task type (M6 `tag-style`)
 
 | Token | Hex | When used |
 |---|---|---|
-| `type-feature` | `#10B981` | Cards tagged `feature` (accent stripe + icon) |
-| `type-bug` | `#DC2626` | Cards tagged `bug` (accent stripe + icon) |
+| `type_feature` | `#10B981` | Cards tagged `feature` (accent stripe + icon) |
+| `type_bug` | `#DC2626` | Cards tagged `bug` (accent stripe + icon) |
 
 ### Due-date states (M8 `due-tint`)
 
 | Token | Hex | When used |
 |---|---|---|
-| `due-safe` | `#7FA886` | More than 2 days out |
-| `due-warning` | `#C08A2E` | Less than 24 hours |
-| `due-overdue` | `#B23A3A` | Past due |
-| `due-neutral` | `#9A94A3` | Done (overrides date) |
+| `due_safe` | `#7FA886` | More than 2 days out |
+| `due_warning` | `#C08A2E` | Less than 24 hours |
+| `due_overdue` | `#B23A3A` | Past due |
+| `due_neutral` | `#9A94A3` | Done (overrides date) |
 
 ## 3. Typography
 

@@ -44,7 +44,51 @@ export const STAGES = [
 
 // Replace these placeholders with the three names from PRD §8 before M4.
 // They become the only valid values for `Task.assignee`.
-export const TEAM = ['Teammate A', 'Teammate B', 'Teammate C'];
+export const TEAM = ['Teammate A'];
+
+// M4 data-model: shown on first load, before anything is in localStorage.
+const SEED_TASKS = [
+  {
+    id: '1',
+    title: 'Fill in PRD team TODOs',
+    description: 'Names, handles and milestone owners in PRD §8–§9.',
+    type: 'feature',
+    status: 'done',
+    assignee: TEAM[0],
+    dueDate: '2026-10-20',
+    createdDate: '2026-10-20',
+  },
+  {
+    id: '2',
+    title: 'Build the four-column board',
+    description: 'Render STAGES as columns and filter tasks by status.',
+    type: 'feature',
+    status: 'in-progress',
+    assignee: TEAM[0],
+    dueDate: '2026-10-21',
+    createdDate: '2026-10-20',
+  },
+  {
+    id: '3',
+    title: 'Placeholder text shows wrong milestone',
+    description: 'README says M3 is the first build milestone; it is M4.',
+    type: 'bug',
+    status: 'review',
+    assignee: TEAM[0],
+    dueDate: '2026-10-22',
+    createdDate: '2026-10-20',
+  },
+  {
+    id: '4',
+    title: 'Add / edit / delete modal',
+    description: 'M5: "+" button and click-to-edit, persisted to localStorage.',
+    type: 'feature',
+    status: 'todo',
+    assignee: TEAM[A],
+    dueDate: '2026-10-23',
+    createdDate: '2026-10-20',
+  },
+];
 
 /**
  * A tiny localStorage hook — survives reloads, no library needed.
@@ -74,8 +118,7 @@ export function useLocalStorage(key, initialValue) {
 }
 
 export default function App() {
-  // TODO M4 data-model:
-  //   const [tasks, setTasks] = useLocalStorage('vibetracker.tasks', [/* 3-4 seed tasks */]);
+  const [tasks, setTasks] = useLocalStorage('vibetracker.tasks', SEED_TASKS);
   //
   // TODO M5 crud-modal:
   //   const [editing, setEditing] = useState(null);
@@ -84,14 +127,14 @@ export default function App() {
   //   const [anchors, setAnchors] = useLocalStorage('vibetracker.anchors', [...]);
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen bg-surface_page p-6">
       <header className="mb-6 flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
             Vibecoding Project Tracker
           </h1>
           <p className="text-sm text-slate-500">
-            {/* Replace this line with your team name from PRD §11. */}
+            C2406921
             Team starter
           </p>
         </div>
@@ -100,17 +143,31 @@ export default function App() {
       {/* TODO M11 anchors: render the Anchor Board (Presentation / Demo / Report / Documentation) above the board. */}
 
       {/*
-        TODO M4 data-model:
-          Render a Kanban board with the four columns from STAGES.
-          Each column should display the tasks whose status matches its id.
-          Pre-populate 3-4 mock tasks so the board isn't empty on first load.
-
         TODO M5 crud-modal:
           Add a "+" button that opens a modal with every Task field.
           Clicking a card should open the same modal in edit mode.
       */}
-      <main className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-slate-300 text-slate-400">
-        Build the four-column board here · M4
+      <main className="grid grid-cols-4 gap-4">
+        {STAGES.map((stage) => {
+          const stageTasks = tasks.filter((task) => task.status === stage.id);
+          return (
+            <section key={stage.id} className="rounded-lg border border-text_muted/20 p-3">
+              <h2 className="mb-3 text-base font-semibold uppercase text-text_primary">
+                {stage.label} <span className="text-text_muted">({stageTasks.length})</span>
+              </h2>
+              <div className="space-y-2">
+                {stageTasks.map((task) => (
+                  <article key={task.id} className="rounded-lg border border-text_muted/20 bg-surface_card p-3">
+                    <h3 className="text-sm font-medium text-text_primary">{task.title}</h3>
+                    <p className="text-xs text-text_muted">
+                      {task.assignee} · due {task.dueDate}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </main>
     </div>
   );
