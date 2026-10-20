@@ -97,6 +97,24 @@ const TYPE_STYLE = {
   bug:     { label: 'Bug',     stripe: 'border-l-bug',     icon: <Bug size={12} className="text-bug" /> },
 };
 
+// M8 due-tint: card background by how close the due date is.
+const DUE_TINT = {
+  safe: 'bg-due_safe/15',
+  warning: 'bg-due_warning/20',
+  overdue: 'bg-due_overdue/15',
+  neutral: 'bg-due_neutral/15',
+};
+
+function dueState(task) {
+  if (task.status === 'done') return 'neutral';
+  if (!task.dueDate) return null;
+  const today = new Date().toLocaleDateString('en-CA'); // local date as YYYY-MM-DD
+  const daysLeft = (Date.parse(task.dueDate) - Date.parse(today)) / 86400000;
+  if (daysLeft < 0) return 'overdue';
+  if (daysLeft < 1) return 'warning';
+  return 'safe';
+}
+
 /**
  * A tiny localStorage hook — survives reloads, no library needed.
  *
@@ -301,14 +319,14 @@ export default function App() {
                   <article
                     key={task.id}
                     onClick={() => setEditing(task)}
-                    className={`cursor-pointer rounded-lg border border-l-4 border-text_muted/20 ${TYPE_STYLE[task.type].stripe} bg-surface_card p-3`}
+                    className={`cursor-pointer rounded-lg border border-l-4 border-text_muted/20 ${TYPE_STYLE[task.type].stripe} ${DUE_TINT[dueState(task)] ?? 'bg-surface_card'} p-3`}
                   >
                     <span className="mb-1 inline-flex items-center gap-1 text-xs text-text_muted">
                       {TYPE_STYLE[task.type].icon}
                       {TYPE_STYLE[task.type].label}
                     </span>
                     <h3 className="text-sm font-medium text-text_primary">{task.title}</h3>
-                    <p className="text-xs text-text_muted">due {task.dueDate}</p>
+                    {task.dueDate && <p className="text-xs text-text_muted">due {task.dueDate}</p>}
                     <div className="mt-2 flex items-center justify-between gap-2">
                       <span className="inline-flex items-center gap-1 text-xs text-text_primary">
                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand_primary text-[10px] font-semibold text-surface_card">
