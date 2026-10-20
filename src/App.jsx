@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bug, Sparkles } from 'lucide-react';
+import { Bug, Copy, Sparkles } from 'lucide-react';
 
 /**
  * Vibecoding Project Tracker — starter scaffold.
@@ -116,6 +116,35 @@ function dueState(task) {
   if (daysLeft < 0) return 'overdue';
   if (daysLeft < 1) return 'warning';
   return 'safe';
+}
+
+// M10 copy-prompt: the task + context as Markdown, ready to paste into an AI chat.
+function toPromptContext(task) {
+  const stage = STAGES.find((s) => s.id === task.status).label;
+  const contextMeta = [
+    task.contextTool && `from ${task.contextTool}`,
+    task.contextUpdatedAt && `updated ${new Date(task.contextUpdatedAt).toLocaleString()}`,
+  ].filter(Boolean).join(' · ');
+
+  return [
+    `Task: ${task.title}`,
+    '',
+    `Type: ${TYPE_STYLE[task.type].label}`,
+    `Status: ${stage}`,
+    `- Assignee: ${task.assignee}`,
+    `- Due: ${task.dueDate ?? 'none'}`,
+    `- Created: ${task.createdDate}`,
+    '',
+    'Description',
+    task.description || 'No description.',
+    '',
+    'Context',
+    ...(contextMeta ? [`${contextMeta}`, ''] : []),
+    task.context || 'No context yet.',
+    '',
+    '---',
+    'Continue this task from where it was left off.',
+  ].join('\n');
 }
 
 /**
@@ -320,6 +349,14 @@ export default function App() {
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, assignee: name } : t)));
     setToast(`Handed to ${name}, goodluck to them.`);
   }
+
+  // M10 copy-prompt
+  function copyPrompt(task) {
+    navigator.clipboard
+      .writeText(toPromptContext(task))
+      .then(() => setToast('Copied and ready for AI'))
+      .catch(() => setToast("Couldn't copy, try again."));
+  }
   //
   // TODO M11 anchors:
   //   const [anchors, setAnchors] = useLocalStorage('vibetracker.anchors', [...]);
@@ -386,6 +423,16 @@ export default function App() {
                         ))}
                       </select>
                     </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copyPrompt(task);
+                      }}
+                      className="mt-2 flex w-full items-center justify-center gap-1 rounded-md border border-brand_primary py-1 text-xs font-medium text-brand_primary hover:bg-brand_primary hover:text-surface_card"
+                    >
+                      <Copy size={12} />
+                      Copy as Prompt Context
+                    </button>
                   </article>
                 ))}
               </div>
