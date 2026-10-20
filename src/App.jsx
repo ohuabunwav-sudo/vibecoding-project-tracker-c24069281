@@ -248,6 +248,20 @@ export default function App() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
     setEditing(null);
   }
+
+  // M7 task-owner: reassign from the card and show a short toast.
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  function handOff(id, name) {
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, assignee: name } : t)));
+    setToast(`Handed to ${name}, goodluck to them.`);
+  }
   //
   // TODO M11 anchors:
   //   const [anchors, setAnchors] = useLocalStorage('vibetracker.anchors', [...]);
@@ -294,9 +308,26 @@ export default function App() {
                       {TYPE_STYLE[task.type].label}
                     </span>
                     <h3 className="text-sm font-medium text-text_primary">{task.title}</h3>
-                    <p className="text-xs text-text_muted">
-                      {task.assignee} · due {task.dueDate}
-                    </p>
+                    <p className="text-xs text-text_muted">due {task.dueDate}</p>
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1 text-xs text-text_primary">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand_primary text-[10px] font-semibold text-surface_card">
+                          {task.assignee.split(' ').map((word) => word[0]).join('')}
+                        </span>
+                        {task.assignee}
+                      </span>
+                      <select
+                        value=""
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => handOff(task.id, e.target.value)}
+                        className="rounded border border-text_muted/30 bg-surface_page text-xs text-text_muted"
+                      >
+                        <option value="" disabled>Hand off to…</option>
+                        {TEAM.filter((name) => name !== task.assignee).map((name) => (
+                          <option key={name} value={name}>{name}</option>
+                        ))}
+                      </select>
+                    </div>
                   </article>
                 ))}
               </div>
@@ -312,6 +343,12 @@ export default function App() {
           onDelete={tasks.some((t) => t.id === editing.id) ? deleteTask : undefined}
           onClose={() => setEditing(null)}
         />
+      )}
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 rounded-md bg-text_primary px-4 py-2 text-sm text-surface_card">
+          {toast}
+        </div>
       )}
     </div>
   );
