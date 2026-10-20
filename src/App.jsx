@@ -100,6 +100,14 @@ const TYPE_STYLE = {
   bug:     { label: 'Bug',     stripe: 'border-l-bug',     icon: <Bug size={12} className="text-bug" /> },
 };
 
+// M11 anchors: the four pinned deliverable slots (PRD §5).
+const SEED_ANCHORS = [
+  { id: 'presentation',  label: 'Presentation',  url: null },
+  { id: 'demo',          label: 'Demo',          url: null },
+  { id: 'report',        label: 'Report',        url: null },
+  { id: 'documentation', label: 'Documentation', url: null },
+];
+
 // M8 due-tint: card background by how close the due date is.
 const DUE_TINT = {
   safe: 'bg-due_safe/15',
@@ -358,8 +366,13 @@ export default function App() {
       .catch(() => setToast("Couldn't copy, try again."));
   }
   //
-  // TODO M11 anchors:
-  //   const [anchors, setAnchors] = useLocalStorage('vibetracker.anchors', [...]);
+  const [anchors, setAnchors] = useLocalStorage('vibetracker.anchors', SEED_ANCHORS);
+
+  function editAnchor(anchor) {
+    const url = window.prompt(`Paste the link for ${anchor.label}`, anchor.url ?? '');
+    if (url === null) return; // cancelled
+    setAnchors((prev) => prev.map((a) => (a.id === anchor.id ? { ...a, url: url.trim() || null } : a)));
+  }
 
   return (
     <div className="min-h-screen bg-surface_page p-6">
@@ -381,7 +394,26 @@ export default function App() {
         </button>
       </header>
 
-      {/* TODO M11 anchors: render the Anchor Board (Presentation / Demo / Report / Documentation) above the board. */}
+      <section className="mb-6 grid grid-cols-4 gap-4">
+        {anchors.map((anchor) => (
+          <div
+            key={anchor.id}
+            className={`rounded-lg p-3 ${anchor.url ? 'border border-brand_primary/30 bg-surface_card' : 'border border-dashed border-due_neutral'}`}
+          >
+            <h2 className="text-xs font-semibold uppercase text-text_muted">{anchor.label}</h2>
+            {anchor.url ? (
+              <a href={anchor.url} target="_blank" rel="noreferrer" className="block truncate text-sm text-brand_accent underline">
+                {anchor.url}
+              </a>
+            ) : (
+              <p className="text-sm text-text_muted">No link yet</p>
+            )}
+            <button onClick={() => editAnchor(anchor)} className="mt-1 text-xs text-brand_primary hover:text-brand_accent">
+              {anchor.url ? 'Edit link' : 'Add link'}
+            </button>
+          </div>
+        ))}
+      </section>
 
       <main className="grid grid-cols-4 gap-4">
         {STAGES.map((stage) => {
