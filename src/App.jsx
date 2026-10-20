@@ -157,6 +157,7 @@ function toPromptContext(task) {
 
 /**
  * A tiny localStorage hook — survives reloads, no library needed.
+ * 
  *  Usage:
  *   const [tasks, setTasks] = useLocalStorage('vibetracker.tasks', []);
  */
