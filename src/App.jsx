@@ -512,11 +512,11 @@ export default function App() {
       <header className="mb-6 flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Vibecoding Project Tracker
+            Cosy Coder's
           </h1>
           <p className="text-sm text-slate-500">
             C2406921
-            Cosy Coder's
+            Vibe coding project tracker
           </p>
         </div>
         <button
