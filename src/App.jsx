@@ -48,7 +48,7 @@ export const STAGES = [
 
 // Replace these placeholders with the three names from PRD §8 before M4.
 // They become the only valid values for `Task.assignee`.
-export const TEAM = ['Teammate A'];
+export const TEAM = ['Teammate A', 'Teammate B', 'Teammate C'];
 
 // M4 data-model: shown on first load, before anything is in localStorage.
 const SEED_TASKS = [
@@ -69,7 +69,7 @@ const SEED_TASKS = [
     type: 'feature',
     status: 'in-progress',
     assignee: TEAM[0],
-    dueDate: '2026-10-21',
+    dueDate: '2027-10-21',
     createdDate: '2026-10-20',
   },
   {
@@ -79,7 +79,7 @@ const SEED_TASKS = [
     type: 'bug',
     status: 'review',
     assignee: TEAM[0],
-    dueDate: '2026-10-22',
+    dueDate: '2027-10-22',
     createdDate: '2026-10-20',
   },
   {
@@ -89,8 +89,11 @@ const SEED_TASKS = [
     type: 'feature',
     status: 'todo',
     assignee: TEAM[0],
-    dueDate: '2026-10-23',
+    dueDate: new Date().toISOString().slice(0, 10),
     createdDate: '2026-10-20',
+    context: 'Create a modal that allows you to create, edit and deletes tasks in the project. It must be able to survive page reloads.',
+    contextTool: 'Claude',
+    contextUpdatedAt: '2026-10-28T00:06:11.000Z',
   },
   {
     id: '5',
@@ -235,7 +238,7 @@ function ProgressChart({ tasks }) {
 // M11 anchors: the four pinned deliverable slots (PRD §5).
 const SEED_ANCHORS = [
   { id: 'presentation',  label: 'Presentation',  url: null },
-  { id: 'demo',          label: 'Demo',          url: null },
+  { id: 'demo',          label: 'Demo',          url: '[https://vibecoding-project-tracker-c2406928.vercel.app/](https://vibecoding-project-tracker-c2406928.vercel.app/)' },
   { id: 'report',        label: 'Report',        url: null },
   { id: 'documentation', label: 'Documentation', url: null },
 ];
@@ -348,7 +351,7 @@ function TaskModal({ task, onSave, onDelete, onClose }) {
             (draft.context ?? '') !== (task.context ?? '') || (draft.contextTool ?? null) !== (task.contextTool ?? null);
           onSave(contextChanged ? { ...draft, contextUpdatedAt: new Date().toISOString() } : draft);
         }}
-        className="w-full max-w-md space-y-3 rounded-lg bg-surface_card p-6"
+        className="max-h-[90vh] w-full max-w-md space-y-3 overflow-y-auto rounded-lg bg-surface_card p-6"
       >
         <h2 className="text-lg font-semibold text-text_primary">{onDelete ? 'Edit task' : 'New task'}</h2>
 
@@ -511,11 +514,11 @@ export default function App() {
     <div className="min-h-screen bg-surface_page p-6">
       <header className="mb-6 flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-brand_primary">
             Cosy Coder's
           </h1>
           <p className="text-sm text-slate-500">
-            C2406921
+            C24069281
             Vibe coding project tracker
           </p>
         </div>
